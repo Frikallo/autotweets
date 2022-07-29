@@ -7,7 +7,6 @@ from transformers import (
 )
 import random
 import tweepy
-from tweepy import OAuthHandler
 from dotenv import load_dotenv
 import os
 import time
@@ -23,6 +22,8 @@ EPOCHS = 4
 HUB_TOKEN = os.environ["HUB_TOKEN"]
 consumer_key = os.environ["CONSUMER_KEY"]
 consumer_secret = os.environ["CONSUMER_SECRET"]
+access_token = os.environ["ACCESS_TOKEN"]
+access_token_secret = os.environ["ACCESS_TOKEN_SECRET"]
 
 
 def fix_text(text):
@@ -58,7 +59,8 @@ def boring_tweet(tweet):
 
 
 # authenticate
-auth = tweepy.AppAuthHandler(consumer_key, consumer_secret)
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
 
@@ -265,7 +267,7 @@ while True:
     # prediction
     output_sequences = trainer.model.generate(
         input_ids=encoded_prompt,
-        max_length=160,
+        max_length=280,
         min_length=10,
         temperature=1.0,
         top_p=0.95,
@@ -311,10 +313,13 @@ while True:
                     tweet = generated_sequences[int(tweet_idx) - 1]
                     api.update_status(tweet)
                     print("Tweeted: {}".format(tweet))
-                    break
-                except:
-                    print("Invalid index or credentials. Try again.")
+                    exit()
+                except Exception as e:
+                    print("Invalid index or credentials. Try again.", e)
                     continue
+            else:
+                break
+
         if yn == "n":
             print("\nNo tweet sent.")
             break
