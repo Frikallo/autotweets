@@ -199,6 +199,10 @@ except:
 
         create_dataset()
 
+        while True:
+            model = input("Enter pretrained model you would like to finetune: ")
+            print("checking if model is valid... (valid models must be available on www.huggingface.com/models")
+
         handle = "-".join(sorted(handles_formatted))
 
         os.system(
