@@ -200,14 +200,21 @@ except:
         create_dataset()
 
         while True:
-            model = input("Enter pretrained model you would like to finetune: ")
-            print("checking if model is valid... (valid models must be available on www.huggingface.com/models")
+            pretrained = input("Enter pretrained model you would like to finetune: ")
+            print("checking if model is valid... (valid models must be available on https://huggingface.co/models)")
+            try:
+                temp_model = AutoModelForCausalLM.from_pretrained(pretrained)
+                print("Model is valid for finetuning, continuing...")
+                break
+            except:
+                print("Model was not found... Make sure your model is available on HuggingFace, Returning...")
+                continue
 
         handle = "-".join(sorted(handles_formatted))
 
         os.system(
             f"python run_clm.py \
-            --model_name_or_path gpt2 \
+            --model_name_or_path pretrained \
             --train_file data_{'-'.join(sorted(handles_formatted))}_train.txt \
             --num_train_epochs 1 \
             --per_device_train_batch_size 1 \
