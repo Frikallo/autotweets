@@ -190,17 +190,12 @@ except:
         "Dataset does not exist. Would you like to create & finetune it? (y/n): "
     )
     if yn == "y":
-        n = 6
-        for _ in range(0, 5):
-            n -= 1
-            print(f"{n}...")
-            time.sleep(1)
         print("Creating...")
 
         create_dataset()
 
         while True:
-            pretrained = input("Enter pretrained model you would like to finetune: ")
+            pretrained = input("Enter pretrained model you would like to finetune: (ex. gpt2) ")
             print("checking if model is valid... (valid models must be available on https://huggingface.co/models)")
             try:
                 temp_model = AutoModelForCausalLM.from_pretrained(pretrained)
@@ -214,7 +209,7 @@ except:
 
         os.system(
             f"python run_clm.py \
-            --model_name_or_path pretrained \
+            --model_name_or_path {pretrained} \
             --train_file data_{'-'.join(sorted(handles_formatted))}_train.txt \
             --num_train_epochs 1 \
             --per_device_train_batch_size 1 \
@@ -267,7 +262,15 @@ trainer = Trainer(
 
 while True:
 
-    start = input("Prompt: ")
+    while True:
+        start = input("Prompt: ")
+
+        if len(start.strip()) == 0:
+            print("No prompt provided.")
+            continue
+        else:
+            break
+
 
     start_with_bos = "<|endoftext|>" + start
     encoded_prompt = trainer.tokenizer(
